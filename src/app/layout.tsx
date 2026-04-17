@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -10,6 +11,9 @@ const outfit = Outfit({
 export const metadata: Metadata = {
   title: "Bologna JR",
   description: "The smart portal to get your results",
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 export default function RootLayout({
@@ -20,7 +24,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full antialiased" suppressHydrationWarning>
       <body className={`${outfit.className} min-h-full flex flex-col bg-[#05050a]`}>
-        {children}
+        <LanguageProvider>
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   );

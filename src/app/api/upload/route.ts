@@ -25,26 +25,36 @@ export async function POST(req: NextRequest) {
 
         // -------------------------------------------------------------
         // الحالة الأولى: تسجيل الطلاب (Complete Database)
-        // العناوين المطلوبة في الصف الأول: Code, Name
+        // يدعم وجود عناوين (Code, Name) أو بدون عناوين (تلقائي)
         // -------------------------------------------------------------
         if (uploadMode === "complete") {
+            const rawData2D = xlsx.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
             let addedCount = 0;
-            for (const rawRow of rawData) {
-                // توحيد الحروف لتلافي مشاكل (code, Code, CODE)
-                const row = Object.keys(rawRow).reduce((acc: any, key) => {
-                    acc[key.trim().toLowerCase()] = rawRow[key];
-                    return acc;
-                }, {});
 
-                const valCode = row["code"];
-                const valName = row["name"];
+            for (const row of rawData2D) {
+                if (!row || row.length < 2) continue;
 
-                if (valCode === undefined || valName === undefined) continue;
+                const val0 = String(row[0] || "").trim();
+                const val1 = String(row[1] || "").trim();
 
-                const studentCode = String(valCode).trim();
-                const studentName = String(valName).trim();
+                // تخطي صف العناوين إذا كان موجوداً
+                if (val0.toLowerCase() === 'name' || val1.toLowerCase() === 'code' || val0 === 'الاسم' || val0.toLowerCase() === 'code') {
+                    continue;
+                }
 
-                if (!studentCode || !studentName) continue;
+                // الكود عادة يحتوي على حروف إنجليزية وأرقام ولا يحتوي على مسافات
+                const isCode1 = /^[a-zA-Z0-9_.-]+$/.test(val1);
+                
+                let studentName = val0;
+                let studentCode = val1;
+
+                // إذا كان العمود الأول هو الكود بدلاً من الثاني، نبدل القيم
+                if (!isCode1 && /^[a-zA-Z0-9_.-]+$/.test(val0)) {
+                    studentCode = val0;
+                    studentName = val1;
+                }
+
+                if (!studentCode || !studentName || studentCode === 'undefined' || studentName === 'undefined') continue;
 
                 await prisma.student.upsert({
                     where: { code: studentCode },
@@ -54,8 +64,8 @@ export async function POST(req: NextRequest) {
                 addedCount++;
             }
 
-            if (addedCount === 0 && rawData.length > 0) {
-                return NextResponse.json({ error: "لم يتم العثور على أي بيانات! تأكد أن العناوين في الصف الأول هي: Code و Name" }, { status: 400 });
+            if (addedCount === 0 && rawData2D.length > 0) {
+                return NextResponse.json({ error: "لم يتم العثور على أي بيانات خاضعة لشروط التسجيل! تأكد من الملف الخاص بك." }, { status: 400 });
             }
 
             return NextResponse.json({ message: `تم تسجيل ${addedCount} طالب بنجاح!` }, { status: 200 });

@@ -36,3 +36,17 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: "Failed to delete student. Perhaps code does not exist?" }, { status: 500 });
   }
 }
+
+// دالة لجلب جميع الطلاب
+export async function GET() {
+  try {
+    const students = await prisma.student.findMany({
+      orderBy: { name: 'asc' },
+      select: { code: true, name: true }
+    });
+    return NextResponse.json(students, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching students:", error);
+    return NextResponse.json({ error: "Failed to fetch students" }, { status: 500 });
+  }
+}

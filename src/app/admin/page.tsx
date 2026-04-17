@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import AdminGradeUploader from "@/components/AdminGradeUploader";
 
 export default function AdminPage() {
     const router = useRouter();
@@ -326,7 +327,7 @@ export default function AdminPage() {
 
                     <div className="flex flex-col items-center space-y-6 mb-10">
                         <div className="w-24 h-24 sm:w-28 sm:h-28 relative rounded-full overflow-hidden shadow-2xl p-1 bg-gradient-to-b from-white/10 to-transparent border border-white/10 hover:scale-105 transition-transform duration-500 ease-out cursor-default">
-                            <Image src="/logo.jpeg" alt="Bologna JR" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover rounded-full" priority />
+                            <Image src="/logo.png" alt="Bologna JR" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover rounded-full" priority />
                         </div>
                         <div className="text-center">
                             <h1 className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-white/50 tracking-tight drop-shadow-md">Admin Portal</h1>
@@ -383,7 +384,7 @@ export default function AdminPage() {
             <nav className="relative z-10 w-full border-b border-white/5 bg-white/[0.02] backdrop-blur-2xl px-5 sm:px-10 py-4 flex justify-between items-center shadow-lg">
                 <div className="flex items-center gap-4">
                     <div className="w-10 h-10 relative rounded-full overflow-hidden shadow-2xl p-0.5 bg-gradient-to-b from-white/10 to-transparent border border-white/10">
-                        <Image src="/logo.jpeg" alt="Bologna JR" fill className="object-cover rounded-full" priority />
+                        <Image src="/logo.png" alt="Bologna JR" fill className="object-cover rounded-full" priority />
                     </div>
                     <div>
                         <h1 className="text-base sm:text-lg font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-white/60 tracking-tight">Bologna JR</h1>
@@ -427,92 +428,7 @@ export default function AdminPage() {
 
                 {/* TAB 1: UPLOAD GRADES */}
                 {activeTab === 'upload' && (
-                    <div className="w-full max-w-2xl rounded-[2.5rem] bg-white/[0.03] backdrop-blur-2xl border border-white/[0.05] shadow-[0_8px_40px_0_rgba(0,0,0,0.8)] p-8 sm:p-12 relative overflow-hidden group animate-in fade-in zoom-in-95 duration-500">
-                        <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-50" />
-
-                        <div className="text-center mb-8">
-                            <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight mb-2">Upload Grades</h2>
-                            <p className="text-sm text-white/40 font-medium mb-5">
-                                {gradeUploadMode === "specific" 
-                                    ? "Upload student scores for a specific exam."
-                                    : "Upload a full semester breakdown. Exam columns will be extracted dynamically."
-                                }
-                                <br/>
-                                <span className="text-brand-primary font-bold">
-                                    Headers must be in Row 1: <code className="bg-white/10 px-1 rounded mx-1">Code</code> 
-                                    {gradeUploadMode === "specific" ? "and" : ""} <code className="bg-white/10 px-1 rounded mx-1">{gradeUploadMode === "specific" ? "Score" : "[Exam 1], [Exam 2]..."}</code>
-                                </span>
-                            </p>
-                            
-                            <div className="flex bg-white/5 border border-white/10 rounded-xl max-w-[20rem] mx-auto overflow-hidden p-1">
-                                <button type="button" onClick={() => setGradeUploadMode("specific")} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${gradeUploadMode === "specific" ? "bg-white text-black shadow-md" : "text-white/50 hover:text-white"}`}>Specific Exam</button>
-                                <button type="button" onClick={() => setGradeUploadMode("semester")} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${gradeUploadMode === "semester" ? "bg-white text-black shadow-md" : "text-white/50 hover:text-white"}`}>Full Semester</button>
-                            </div>
-                        </div>
-
-                        <form onSubmit={handleUpload} className="flex flex-col gap-8">
-                            <div className="flex flex-col sm:flex-row gap-4 animate-in slide-in-from-top-4 fade-in duration-300">
-                                <div className="flex-1">
-                                    <label className="block text-xs font-bold text-white/40 uppercase tracking-widest mb-2 pl-2">Subject</label>
-                                    <select value={selectedSubject} onChange={(e) => setSelectedSubject(e.target.value)} className="w-full h-14 bg-black/50 border border-white/10 rounded-2xl px-4 text-white focus:outline-none focus:border-brand-primary/50 transition-all font-semibold shadow-inner appearance-none">
-                                        <option value="" disabled>Select Subject...</option>
-                                        {subjectsList.map((sub) => (
-                                            <option key={sub.id} value={sub.id}>
-                                                {sub.id} - {sub.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                                {gradeUploadMode === "specific" && (
-                                    <div className="flex-1 animate-in fade-in zoom-in-95">
-                                        <label className="block text-xs font-bold text-white/40 uppercase tracking-widest mb-2 pl-2">Exam Type</label>
-                                        <input type="text" value={examName} onChange={(e) => setExamName(e.target.value)} placeholder="e.g. Midterm 1" className="w-full h-14 bg-black/50 border border-white/10 rounded-2xl px-4 text-white placeholder:text-white/20 focus:outline-none focus:border-brand-primary/50 transition-all font-semibold shadow-inner" />
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* File Drag & Drop */}
-                            <div className="relative group/upload w-full">
-                                <input type="file" id="file-upload" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" onChange={handleFileChange} className="hidden" />
-                                <label htmlFor="file-upload" className={`flex flex-col items-center justify-center w-full h-48 sm:h-56 border border-white/5 rounded-[2rem] cursor-pointer transition-all duration-300 shadow-inner backdrop-blur-sm ${selectedFile ? 'bg-brand-primary/10 border-brand-primary/50 shadow-[0_0_15px_rgba(0,229,255,0.1)]' : 'bg-black/50 hover:bg-white/5 hover:border-brand-primary/30'}`}>
-                                    <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
-                                        {selectedFile ? (
-                                            <>
-                                                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-brand-primary/20 flex items-center justify-center mb-4 border border-brand-primary/30 shadow-[0_0_15px_rgba(0,229,255,0.2)]">
-                                                    <svg className="w-7 h-7 sm:w-8 sm:h-8 text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                                </div>
-                                                <p className="text-base sm:text-lg font-bold text-white mb-1 truncate w-full max-w-[16rem]">{selectedFile.name}</p>
-                                                <p className="text-[10px] sm:text-xs text-white/40 font-semibold tracking-widest uppercase mt-2">Ready to upload</p>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white/5 flex items-center justify-center mb-4 border border-white/10 group-hover/upload:scale-110 transition-transform duration-300">
-                                                    <svg className="w-7 h-7 sm:w-8 sm:h-8 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                                                </div>
-                                                <p className="text-sm sm:text-lg text-white/60 font-bold mb-1"><span className="text-white">Click to browse</span> or drag and drop</p>
-                                                <p className="text-[10px] sm:text-xs text-white/30 font-semibold tracking-widest mt-2 uppercase">.CSV / .XLSX</p>
-                                            </>
-                                        )}
-                                    </div>
-                                </label>
-                                <div className="absolute bottom-[-1px] left-1/2 -translate-x-1/2 w-0 h-[2px] bg-brand-primary group-hover/upload:w-3/4 transition-all duration-500 ease-out shadow-[0_0_10px_#00E5FF]" />
-                            </div>
-
-                            <button type="submit" disabled={!selectedFile || isUploading} className={`group relative w-full h-16 text-black font-extrabold text-lg sm:text-xl rounded-2xl transition-all duration-300 active:scale-[0.97] flex items-center justify-center overflow-hidden ${!selectedFile ? 'bg-white/10 text-white/30 cursor-not-allowed border border-white/5' : 'bg-white hover:bg-brand-primary shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(0,229,255,0.3)]'}`}>
-                                {isUploading ? (
-                                    <span className="relative z-10 flex items-center gap-3">
-                                        <svg className="animate-spin h-6 w-6 text-black" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                        Processing...
-                                    </span>
-                                ) : (
-                                    <span className="relative z-10 flex items-center gap-2">
-                                        Process Exam Grades File
-                                        <svg className={`w-6 h-6 opacity-60 transition-transform duration-300 ease-out ${selectedFile ? 'group-hover:-translate-y-1' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
-                                    </span>
-                                )}
-                            </button>
-                        </form>
-                    </div>
+                    <AdminGradeUploader subjectsList={subjectsList} />
                 )}
 
                 {/* TAB 2: MANAGE SUBJECTS */}

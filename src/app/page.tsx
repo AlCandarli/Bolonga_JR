@@ -35,7 +35,7 @@ export default function LoginPage() {
           <div className="flex flex-col items-center space-y-5 mb-10">
             <div className="w-24 h-24 sm:w-28 sm:h-28 relative rounded-full overflow-hidden shadow-2xl p-1 bg-gradient-to-b from-white/10 to-transparent border border-white/20">
               <Image
-                src="/logo.jpeg"
+                src="/logo.png"
                 alt="شعار بولونيا جونير"
                 fill
                 sizes="(max-width: 768px) 100vw, 33vw"
@@ -103,6 +103,15 @@ export default function LoginPage() {
             className="text-white font-extrabold hover:text-brand-primary transition-all duration-300 hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.7)]"
           >
             Çandarli Paşa
+          </a>
+          <span className="text-white/20 font-bold">&</span>
+          <a
+            href="https://fahadwm101.github.io/FAHAD.GITHUP/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-white font-extrabold hover:text-brand-primary transition-all duration-300 hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.7)]"
+          >
+            CHEETAH
           </a>
           <span>for R.I.S.E Organization</span>
         </p>
