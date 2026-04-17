@@ -1,0 +1,47 @@
+// إعدادات Prisma لإنشاء الأكواد البرمجية
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "library"
+}
+
+// تحديد نوع قاعدة البيانات ومكانها (SQLite)
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// 1. جدول الطلاب
+model Student {
+  id        String   @id @default(cuid())
+  code      String   @unique // الكود السري (يجب أن يكون غير مكرر)
+  name      String   // اسم الطالب
+  grades    Grade[]  // علاقة: الطالب له عدة درجات
+  createdAt DateTime @default(now())
+}
+
+// 2. جدول المواد
+model Subject {
+  id        String   @id @default(cuid())
+  name      String   // اسم المادة
+  grades    Grade[]  // علاقة: المادة لها عدة درجات للطلاب
+  createdAt DateTime @default(now())
+}
+
+// 3. جدول الدرجات
+model Grade {
+  id        String   @id @default(cuid())
+  score     String   // الدرجة
+  examName  String   @default("General") // نوع الامتحان (مثلاً Midterm 1)
+  
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  subjectId String
+  subject   Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  // تحديث: الطالب ما تتكرر درجته في نفس المادة لنفس الامتحان
+  @@unique([studentId, subjectId, examName], name: "studentId_subjectId_examName")
+  
+  createdAt DateTime @default(now())
+}
+
