@@ -5,9 +5,8 @@ import { translations, Language, TranslationKeys } from "@/lib/translations";
 
 interface LanguageContextProps {
     language: Language;
-    dir: "ltr" | "rtl";
+    dir: "ltr";
     t: (key: TranslationKeys) => string;
-    toggleLanguage: () => void;
 }
 
 const LanguageContext = createContext<LanguageContextProps | undefined>(undefined);
@@ -16,31 +15,20 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     const [language, setLanguage] = useState<Language>("en");
 
     useEffect(() => {
-        // Init on load
-        const storedLang = localStorage.getItem("app_lang") as Language;
-        if (storedLang === "en" || storedLang === "ar") {
-            setLanguage(storedLang);
-            document.documentElement.dir = storedLang === "ar" ? "rtl" : "ltr";
-            document.documentElement.lang = storedLang;
-        }
+        // Force English/LTR on load
+        document.documentElement.dir = "ltr";
+        document.documentElement.lang = "en";
+        setLanguage("en");
     }, []);
 
-    const toggleLanguage = () => {
-        const newLang = language === "en" ? "ar" : "en";
-        setLanguage(newLang);
-        localStorage.setItem("app_lang", newLang);
-        document.documentElement.dir = newLang === "ar" ? "rtl" : "ltr";
-        document.documentElement.lang = newLang;
-    };
-
     const t = (key: TranslationKeys): string => {
-        return translations[language][key] || key;
+        return translations["en"][key] || key;
     };
 
-    const dir = language === "ar" ? "rtl" : "ltr";
+    const dir = "ltr";
 
     return (
-        <LanguageContext.Provider value={{ language, dir, t, toggleLanguage }}>
+        <LanguageContext.Provider value={{ language, dir, t }}>
             {children}
         </LanguageContext.Provider>
     );

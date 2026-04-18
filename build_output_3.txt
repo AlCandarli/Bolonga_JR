@@ -1,0 +1,41 @@
+﻿
+> bologna-jr@0.1.0 build
+> next build
+
+Γû▓ Next.js 16.2.3 (Turbopack)
+- Environments: .env
+
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 4.2s
+  Running TypeScript ...
+  Finished TypeScript in 3.2s ...
+  Collecting page data using 7 workers ...
+  Generating static pages using 7 workers (0/13) ...
+  Generating static pages using 7 workers (3/13) 
+  Generating static pages using 7 workers (6/13) 
+  Generating static pages using 7 workers (9/13) 
+Γ£ô Generating static pages using 7 workers (13/13) in 271ms
+  Finalizing page optimization ...
+
+Route (app)
+Γöî Γùï /
+Γö£ Γùï /_not-found
+Γö£ Γùï /admin
+Γö£ ╞Æ /api/auth
+Γö£ ╞Æ /api/auth/login
+Γö£ ╞Æ /api/auth/logout
+Γö£ ╞Æ /api/auth/me
+Γö£ ╞Æ /api/grades
+Γö£ ╞Æ /api/student/dashboard
+Γö£ ╞Æ /api/students
+Γö£ ╞Æ /api/subjects
+Γö£ ╞Æ /api/upload
+Γö£ Γùï /student
+Γöö ╞Æ /student/subject/[id]
+
+
+╞Æ Proxy (Middleware)
+
+Γùï  (Static)   prerendered as static content
+╞Æ  (Dynamic)  server-rendered on demand
+

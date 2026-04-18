@@ -4,7 +4,6 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams, useParams } from "next/navigation";
 import Image from "next/image";
 import { Download, FileText, AlertCircle, ArrowLeft, ArrowRight } from "lucide-react";
-import LanguageToggle from "@/components/LanguageToggle";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 // Types
@@ -15,7 +14,7 @@ type DashboardData = { studentName: string; studentCode: string; subjects: Subje
 function SubjectContent() {
     const router = useRouter();
     const params = useParams<{ id: string }>();
-    const { t, dir, language } = useLanguage();
+    const { t } = useLanguage();
 
     const id = params?.id;
 
@@ -62,7 +61,7 @@ function SubjectContent() {
 
     if (error) {
         return (
-            <main className="relative min-h-screen w-full flex flex-col justify-center items-center bg-slate-950 text-white" dir={dir}>
+            <main className="relative min-h-screen w-full flex flex-col justify-center items-center bg-slate-950 text-white" dir="ltr">
                 <div className="relative z-10 w-full max-w-sm rounded-[2.5rem] bg-white/[0.03] backdrop-blur-2xl border border-red-500/20 p-10 text-center shadow-2xl">
                     <div className="w-20 h-20 mx-auto rounded-full bg-red-500/10 flex items-center justify-center mb-6 border border-red-500/20">
                         <AlertCircle className="w-10 h-10 text-red-500" />
@@ -79,7 +78,7 @@ function SubjectContent() {
 
     if (isLoading || !data || !subject) {
         return (
-            <main className="relative min-h-screen w-full flex flex-col justify-center items-center bg-slate-950" dir={dir}>
+            <main className="relative min-h-screen w-full flex flex-col justify-center items-center bg-slate-950" dir="ltr">
                 <div className="absolute top-[-10%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-brand-primary opacity-10 blur-[130px] animate-pulse" />
                 <div className="absolute inset-0 bg-black/70 backdrop-blur-[10px]" />
                 <div className="relative z-10 flex flex-col items-center gap-6 animate-pulse">
@@ -91,7 +90,7 @@ function SubjectContent() {
     }
 
     return (
-        <main className={`relative min-h-screen w-full flex flex-col bg-slate-950 text-slate-200 transition-opacity duration-1000 ease-out opacity-100`} dir={dir}>
+        <main className={`relative min-h-screen w-full flex flex-col bg-slate-950 text-slate-200 transition-opacity duration-1000 ease-out opacity-100`} dir="ltr">
             {/* Cinematic Background */}
             <div className="fixed top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none print:hidden">
                 <div className="absolute top-[-20%] right-[-10%] w-[60vw] h-[60vw] rounded-full bg-brand-primary opacity-10 blur-[140px] animate-pulse" style={{ animationDuration: '10s' }} />
@@ -121,7 +120,6 @@ function SubjectContent() {
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
-                        <LanguageToggle />
                         <button 
                             onClick={() => window.print()}
                             className="hidden sm:flex items-center gap-2 px-4 py-2.5 text-sm font-bold bg-brand-primary/10 hover:bg-brand-primary/20 border border-brand-primary/20 rounded-xl transition-all active:scale-95 text-brand-primary backdrop-blur-sm group"
@@ -133,7 +131,7 @@ function SubjectContent() {
                             onClick={() => router.push(`/student`)}
                             className="px-4 py-2.5 text-xs sm:text-sm font-bold bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl transition-all active:scale-95 text-white/60 hover:text-white backdrop-blur-sm group flex items-center gap-2"
                         >
-                            {dir === 'rtl' ? <ArrowRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />}
+                            <ArrowLeft className="w-4 h-4" />
                             {t('back')}
                         </button>
                     </div>
@@ -178,7 +176,7 @@ function SubjectContent() {
                         <div className="grid grid-cols-1 gap-4 sm:gap-6">
                             {subject.grades.map((grade, idx) => {
                                 const d = new Date(grade.date);
-                                const dateStr = d.toLocaleDateString(language === 'ar' ? 'ar-EG' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                                const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
                                 const scoreNum = parseFloat(grade.score);
                                 const isPassing = !isNaN(scoreNum) && scoreNum >= 25; // Scale is now out of 50
 
@@ -195,7 +193,7 @@ function SubjectContent() {
                                                     {grade.examName}
                                                 </h4>
                                             </div>
-                                            <p className={`text-[10px] text-white/30 font-bold uppercase tracking-widest ${dir === 'rtl' ? 'pr-5' : 'pl-5'} print:text-gray-400`}>
+                                            <p className={`text-[10px] text-white/30 font-bold uppercase tracking-widest pl-5 print:text-gray-400`}>
                                                 {dateStr}
                                             </p>
                                         </div>

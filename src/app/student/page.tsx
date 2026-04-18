@@ -4,7 +4,6 @@ import { useState, useEffect, Suspense, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { Search, ChevronDown, BookOpen, TrendingUp, Award, Clock } from "lucide-react";
-import LanguageToggle from "@/components/LanguageToggle";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 // Types
@@ -15,7 +14,7 @@ type DashboardData = { studentName: string; studentCode: string; subjects: Subje
 function DashboardContent() {
     const router = useRouter();
     
-    const { t, dir } = useLanguage();
+    const { t } = useLanguage();
 
     const [isMounted, setIsMounted] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -98,7 +97,7 @@ function DashboardContent() {
 
     if (error) {
         return (
-            <main className="relative min-h-screen w-full flex flex-col justify-center items-center overflow-hidden bg-slate-950 text-white" dir={dir}>
+            <main className="relative min-h-screen w-full flex flex-col justify-center items-center overflow-hidden bg-slate-950 text-white" dir="ltr">
                 <div className="relative z-10 w-full max-w-sm rounded-[2.5rem] bg-white/[0.03] backdrop-blur-2xl border border-red-500/20 shadow-[0_8px_40px_0_rgba(255,0,0,0.1)] p-10 text-center">
                     <div className="w-20 h-20 mx-auto rounded-full bg-red-500/10 flex items-center justify-center mb-6 border border-red-500/20">
                         <svg className="w-10 h-10 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
@@ -108,7 +107,6 @@ function DashboardContent() {
                     <button onClick={() => router.push('/')} className="w-full h-14 bg-white/10 hover:bg-white text-white hover:text-black font-bold rounded-2xl transition-all duration-300">
                         {t('return_login')}
                     </button>
-                    <div className="mt-4 flex justify-center"><LanguageToggle /></div>
                 </div>
             </main>
         );
@@ -116,7 +114,7 @@ function DashboardContent() {
 
     if (isLoading || !data) {
         return (
-            <main className="relative min-h-screen w-full flex flex-col justify-center items-center overflow-hidden bg-slate-950" dir={dir}>
+            <main className="relative min-h-screen w-full flex flex-col justify-center items-center overflow-hidden bg-slate-950" dir="ltr">
                 <div className="absolute top-[-10%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-brand-primary opacity-10 blur-[130px] animate-pulse" style={{ animationDuration: '8s' }} />
                 <div className="absolute inset-0 bg-black/70 backdrop-blur-[10px]" />
                 <div className="relative z-10 flex flex-col items-center gap-6 animate-pulse">
@@ -129,7 +127,7 @@ function DashboardContent() {
     }
 
     return (
-        <main className={`relative min-h-screen w-full flex flex-col overflow-x-hidden bg-slate-950 text-slate-200 transition-opacity duration-1000 ease-out opacity-100`} dir={dir}>
+        <main className={`relative min-h-screen w-full flex flex-col overflow-x-hidden bg-slate-950 text-slate-200 transition-opacity duration-1000 ease-out opacity-100`} dir="ltr">
             
             {/* Cinematic Layout Background */}
             <div className="fixed top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
@@ -151,11 +149,10 @@ function DashboardContent() {
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
-                        <LanguageToggle />
                         <button onClick={handleLogout} className="px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-bold bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl transition-all active:scale-95 text-white/60 hover:text-white backdrop-blur-sm group">
                             <span className="flex items-center gap-2">
                                 {t('logout')}
-                                <svg className={`w-4 h-4 opacity-50 group-hover:opacity-100 transition-opacity ${dir === 'rtl' ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                                <svg className={`w-4 h-4 opacity-50 group-hover:opacity-100 transition-opacity`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                             </span>
                         </button>
                     </div>
@@ -200,15 +197,12 @@ function DashboardContent() {
                 {/* Controls Section */}
                 <div className="flex flex-col sm:flex-row gap-4 mb-8">
                     <div className="relative flex-1 group">
-                        <div className={`absolute ${dir === 'rtl' ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2`}>
-                            <Search className="w-5 h-5 text-white/40 group-focus-within:text-brand-primary transition-colors" />
-                        </div>
                         <input 
                             type="text" 
                             placeholder={t('search_placeholder')} 
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className={`w-full h-14 bg-white/5 border border-white/10 rounded-xl ${dir === 'rtl' ? 'pr-12 pl-4' : 'pl-12 pr-4'} text-white placeholder:text-white/30 focus:outline-none focus:border-brand-primary/50 focus:bg-white/10 transition-all font-medium shadow-inner`}
+                            className={`w-full h-14 bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 text-white placeholder:text-white/30 focus:outline-none focus:border-brand-primary/50 focus:bg-white/10 transition-all font-medium shadow-inner`}
                         />
                     </div>
                 </div>
@@ -267,7 +261,7 @@ function DashboardContent() {
                                                     <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider mb-1">{t('latest_entry')}</p>
                                                     <p className="text-sm font-semibold text-white/90 line-clamp-1">{sub.latestGrade.examName}</p>
                                                 </div>
-                                                <div className={`text-${dir === 'rtl' ? 'left' : 'right'}`}>
+                                                <div className="text-right">
                                                     <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider mb-1">{t('score')}</p>
                                                     <p className={`text-xl font-black ${isPassing ? 'text-emerald-400' : 'text-rose-400'}`}>{sub.latestGrade.score}</p>
                                                 </div>

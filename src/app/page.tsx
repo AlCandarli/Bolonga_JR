@@ -4,7 +4,6 @@ import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/contexts/LanguageContext";
-import LanguageToggle from "@/components/LanguageToggle";
 
 export default function LoginPage() {
   const [code, setCode] = useState("");
@@ -43,7 +42,7 @@ export default function LoginPage() {
   return (
     <main
       className="relative min-h-screen w-full flex flex-col justify-between overflow-hidden bg-[#05050a]"
-      dir="rtl"
+      dir="ltr"
     >
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
         <div className="absolute top-[-10%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-brand-primary opacity-20 blur-[100px] animate-pulse" style={{ animationDuration: '8s' }} />
@@ -61,7 +60,7 @@ export default function LoginPage() {
             <div className="w-24 h-24 sm:w-28 sm:h-28 relative rounded-full overflow-hidden shadow-2xl p-1 bg-gradient-to-b from-white/10 to-transparent border border-white/20">
               <Image
                 src="/logo.png"
-                alt="شعار بولونيا جونير"
+                alt="Bologna JR Logo"
                 fill
                 sizes="(max-width: 768px) 100vw, 33vw"
                 className="object-cover rounded-full"
@@ -113,8 +112,8 @@ export default function LoginPage() {
                 ) : (
                   <>
                     {t('login')}
-                    <svg className={`w-6 h-6 ${dir === 'rtl' ? 'ml-2' : 'mr-2'} opacity-50`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d={dir === 'rtl' ? "M13 5l7 7-7 7M5 5l7 7-7 7" : "M11 19l-7-7 7-7m8 14l-7-7 7-7"} />
+                    <svg className="w-6 h-6 ml-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
                     </svg>
                   </>
                 )}
@@ -129,7 +128,6 @@ export default function LoginPage() {
             >
               {t('admin_login')}
             </button>
-            <LanguageToggle />
           </div>
         </div>
       </div>
@@ -145,15 +143,6 @@ export default function LoginPage() {
             className="text-white font-extrabold hover:text-brand-primary transition-all duration-300 hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.7)]"
           >
             Çandarli Paşa
-          </a>
-          <span className="text-white/20 font-bold">&</span>
-          <a
-            href="https://fahadwm101.github.io/FAHAD.GITHUP/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-white font-extrabold hover:text-brand-primary transition-all duration-300 hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.7)]"
-          >
-            CHEETAH
           </a>
           <span>for R.I.S.E Organization</span>
         </p>

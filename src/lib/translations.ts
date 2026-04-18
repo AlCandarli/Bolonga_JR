@@ -38,46 +38,7 @@ export const translations = {
         login: "Login",
         admin_login: "Admin Login"
     },
-    ar: {
-        academic_overview: "اللوحة الأكاديمية والمعدل",
-        welcome_back: "مرحباً بعودتك",
-        logout: "تسجيل الخروج",
-        id: "الرقم الجامعي",
-        average_score: "المعدل التراكمي",
-        enrolled_modules: "المواد المسجلة",
-        earned_credits: "الساعات المكتسبة",
-        cr: "ساعة",
-        search_placeholder: "ابحث عن مادة بالاسم أو الرمز...",
-        all_semesters: "كل الفصول",
-        semester_1: "الفصل الأول",
-        semester_2: "الفصل الثاني",
-        no_records_title: "لا توجد سجلات أكاديمية",
-        no_records_desc: "لم يتم رفع أي درجات لحسابك حتى الآن. يرجى المراجعة بعد الامتحانات.",
-        no_matches_title: "لم يتم العثور على نتائج",
-        no_matches_desc: "جرب تعديل كلمة البحث أو فلتر الفصل الدراسي.",
-        pass: "ناجح",
-        fail: "راسب",
-        no_grade: "غير مكتمل",
-        latest_entry: "أحدث امتحان",
-        score: "الدرجة",
-        status: "الحالة",
-        pending_assessment: "بانتظار التقييم",
-        access_denied: "الدخول مرفوض",
-        return_login: "الرجوع لتسجيل الدخول",
-        official_report: "تقرير الدرجات الرسمي",
-        student_name: "اسم الطالب",
-        student_code: "الرقم الجامعي",
-        module: "المادة",
-        download_pdf: "تحميل بصيغة PDF",
-        back: "رجوع",
-        module_record_desc: "السجل الأكاديمي الكامل لهذه المادة. يمكنك تحميل نسخة رسمية من هذه الدرجات لسجلاتك.",
-        no_grades_module: "لا توجد درجات مسجلة لهذه المادة.",
-        smart_portal: "البوابة الذكية للحصول على نتائجك",
-        enter_code_placeholder: "أدخل الكود الخاص بك...",
-        login: "تسجيل الدخول",
-        admin_login: "دخول الإدارة"
-    }
 };
 
-export type Language = "en" | "ar";
+export type Language = "en";
 export type TranslationKeys = keyof typeof translations.en;

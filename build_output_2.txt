@@ -1,0 +1,31 @@
+﻿
+> bologna-jr@0.1.0 build
+> next build
+
+Γû▓ Next.js 16.2.3 (Turbopack)
+- Environments: .env
+
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 3.7s
+  Running TypeScript ...
+node.exe : Failed to type check.
+At line:1 char:1
++ & "C:\nvm4w\nodejs/node.exe" "C:\nvm4w\nodejs/node_modules/npm/bin/np ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Failed to type check.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+./src/app/student/page.tsx:264:73
+Type error: Cannot find name 'dir'.
+
+  [90m262 |[0m ...                       <p className=[32m"text-sm font-semibold text-white/90 line-clamp-1"[0m...
+  [90m263 |[0m ...                   </div>
+[31m[1m>[0m [90m264 |[0m ...                   <div className={[32m`text-[0m${dir === [32m'rtl'[0m ? 
+[32m'left'[0m : [32m'right'[0m[32m}`[0m}>
+  [90m    |[0m                                               [31m[1m^[0m
+  [90m265 |[0m ...                       <p className=[32m"text-[10px] text-white/40 uppercase font-bold tra...[0m
+  [90m266 |[0m ...                       <p className={[32m`text-xl font-black [0m${isPassing ? 
+[32m'text-emerald-4...[0m
+  [90m267 |[0m ...                   </div>
+Next.js build worker exited with code: 1 and signal: null

@@ -52,10 +52,9 @@ export default function AdminPage() {
     const [studentName, setStudentName] = useState("");
     const [studentCode, setStudentCode] = useState("");
     const [isAddingStudent, setIsAddingStudent] = useState(false);
-    // أضف هذا الـ State مع بقية الـ States فوق
     const [subjectsList, setSubjectsList] = useState<{ id: string, name: string }[]>([]);
 
-    // هذي الدالة تجيب المواد من الباك إند
+    // Fetch subjects from the backend
     const fetchSubjects = async () => {
         try {
             const res = await fetch("/api/subjects");
@@ -68,7 +67,7 @@ export default function AdminPage() {
         }
     };
 
-    // أول ما الإدمن يسجل دخول صحيح، خليه يجيب المواد
+    // Fetch subjects immediately after successful admin login
     useEffect(() => {
         if (isAuthenticated) {
             fetchSubjects();
