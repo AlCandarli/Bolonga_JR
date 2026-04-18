@@ -5,7 +5,7 @@ import { cookies } from 'next/headers'
 // Define protected routes that require ANY session
 const protectedRoutes = ['/student']
 
-export async function proxy(req: NextRequest) {
+export default async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname
   const isProtectedRoute = protectedRoutes.some(route => path.startsWith(route))
 
