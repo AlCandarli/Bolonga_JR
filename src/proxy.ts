@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { decrypt } from '@/lib/session'
 import { cookies } from 'next/headers'
 
-// Define protected routes
-const protectedRoutes = ['/student', '/admin']
+// Define protected routes that require ANY session
+const protectedRoutes = ['/student']
 
 export async function proxy(req: NextRequest) {
   const path = req.nextUrl.pathname

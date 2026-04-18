@@ -32,7 +32,11 @@ export const translations = {
         download_pdf: "Download PDF",
         back: "Back",
         module_record_desc: "Complete academic record for this module. You can securely download a copy of these grades for your records.",
-        no_grades_module: "No grade entries available for this module."
+        no_grades_module: "No grade entries available for this module.",
+        smart_portal: "The smart portal to get your results",
+        enter_code_placeholder: "Enter your code...",
+        login: "Login",
+        admin_login: "Admin Login"
     },
     ar: {
         academic_overview: "اللوحة الأكاديمية والمعدل",
@@ -67,7 +71,11 @@ export const translations = {
         download_pdf: "تحميل بصيغة PDF",
         back: "رجوع",
         module_record_desc: "السجل الأكاديمي الكامل لهذه المادة. يمكنك تحميل نسخة رسمية من هذه الدرجات لسجلاتك.",
-        no_grades_module: "لا توجد درجات مسجلة لهذه المادة."
+        no_grades_module: "لا توجد درجات مسجلة لهذه المادة.",
+        smart_portal: "البوابة الذكية للحصول على نتائجك",
+        enter_code_placeholder: "أدخل الكود الخاص بك...",
+        login: "تسجيل الدخول",
+        admin_login: "دخول الإدارة"
     }
 };
 
