@@ -14,8 +14,6 @@ type DashboardData = { studentName: string; studentCode: string; subjects: Subje
 
 function DashboardContent() {
     const router = useRouter();
-    const searchParams = useSearchParams();
-    const code = searchParams.get("code");
     
     const { t, dir } = useLanguage();
 
@@ -28,14 +26,10 @@ function DashboardContent() {
 
     useEffect(() => {
         setIsMounted(true);
-        if (!code) {
-            router.push("/");
-            return;
-        }
 
         const fetchDashboard = async () => {
             try {
-                const res = await fetch(`/api/student/dashboard?code=${code}`);
+                const res = await fetch(`/api/student/dashboard`);
                 const result = await res.json();
                 
                 if (res.ok) {
@@ -52,7 +46,17 @@ function DashboardContent() {
         };
 
         fetchDashboard();
-    }, [code, router, t]);
+    }, [router, t]);
+
+    const handleLogout = async () => {
+        try {
+            await fetch('/api/auth/logout', { method: 'POST' });
+            router.push('/');
+        } catch (err) {
+            console.error("Logout failed:", err);
+            router.push('/');
+        }
+    };
 
     // Data Processing & Calculations
     const processedStats = useMemo(() => {
@@ -148,7 +152,7 @@ function DashboardContent() {
                     </div>
                     <div className="flex items-center gap-3">
                         <LanguageToggle />
-                        <button onClick={() => router.push('/')} className="px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-bold bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl transition-all active:scale-95 text-white/60 hover:text-white backdrop-blur-sm group">
+                        <button onClick={handleLogout} className="px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-bold bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl transition-all active:scale-95 text-white/60 hover:text-white backdrop-blur-sm group">
                             <span className="flex items-center gap-2">
                                 {t('logout')}
                                 <svg className={`w-4 h-4 opacity-50 group-hover:opacity-100 transition-opacity ${dir === 'rtl' ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
@@ -234,7 +238,7 @@ function DashboardContent() {
                             return (
                                 <div 
                                     key={sub.subjectId}
-                                    onClick={() => router.push('/student/subject/' + sub.subjectId + '?code=' + code)}
+                                    onClick={() => router.push('/student/subject/' + sub.subjectId)}
                                     className="group flex flex-col h-full rounded-2xl bg-white/[0.02] hover:bg-white/[0.04] border border-white/10 hover:border-brand-primary/40 shadow-lg hover:shadow-[0_8px_30px_rgba(0,229,255,0.15)] p-6 cursor-pointer transition-all duration-300 hover:-translate-y-1 overflow-hidden relative animate-in fade-in slide-in-from-bottom-8"
                                     style={{ animationDelay: `${idx * 50}ms`, animationFillMode: 'both' }}
                                 >

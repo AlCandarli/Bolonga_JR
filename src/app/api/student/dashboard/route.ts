@@ -1,16 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getSession } from "@/lib/session";
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(req: NextRequest) {
+export async function GET() {
     try {
-        const { searchParams } = new URL(req.url);
-        const code = searchParams.get("code");
+        const session = await getSession();
 
-        if (!code) {
-            return NextResponse.json({ error: "Student code is required parameter." }, { status: 400 });
+        if (!session || !session.userId || session.role !== 'student') {
+            return NextResponse.json({ error: "Unauthorized access. Please login." }, { status: 401 });
         }
+
+        const code = session.userId as string;
 
         // Fetch the student and all their grades (with subjects), ordered by newest first.
         const student = await prisma.student.findUnique({

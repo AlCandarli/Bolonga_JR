@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getSession } from "@/lib/session";
 
 export async function DELETE(req: NextRequest) {
   try {
+    const session = await getSession();
+    if (!session || session.role !== 'admin') {
+        return NextResponse.json({ error: "Unauthorized. Admin access required." }, { status: 401 });
+    }
+
     const { searchParams } = new URL(req.url);
     const subjectId = searchParams.get("subjectId");
     

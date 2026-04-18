@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as xlsx from "xlsx";
 import { prisma } from "@/lib/prisma";
+import { getSession } from "@/lib/session";
 
 export async function POST(req: NextRequest) {
     try {
+        const session = await getSession();
+        if (!session || session.role !== 'admin') {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
         const formData = await req.formData();
         const file = formData.get("file") as File;
         const uploadMode = formData.get("uploadMode") as string;
@@ -12,6 +18,22 @@ export async function POST(req: NextRequest) {
 
         if (!file) {
             return NextResponse.json({ error: "لم يتم العثور على ملف!" }, { status: 400 });
+        }
+
+        // ── Security: file type validation ──────────────────────────────────
+        const allowedTypes = [
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "application/vnd.ms-excel",
+            "text/csv",
+        ];
+        if (!allowedTypes.includes(file.type) && !file.name.match(/\.(xlsx|xls|csv)$/i)) {
+            return NextResponse.json({ error: "نوع الملف غير مدعوم. يُسمح فقط بـ Excel وCSV." }, { status: 400 });
+        }
+
+        // ── Security: file size limit (5 MB) ────────────────────────────────
+        const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
+        if (file.size > MAX_SIZE) {
+            return NextResponse.json({ error: "حجم الملف كبير جداً. الحد الأقصى 5 ميجابايت." }, { status: 400 });
         }
 
         const bytes = await file.arrayBuffer();
@@ -127,7 +149,7 @@ export async function POST(req: NextRequest) {
         }
 
         // -------------------------------------------------------------
-        // الحالة الثالثة: المعالجة الذكية بالذكاء الاصطناعي (AI Semantic Breakdown)
+        // الحالة الثالثة: المعالجة السريعة (Fast Semantic Parsing)
         // -------------------------------------------------------------
         if (uploadMode === "semester" && subjectCode) {
             const rawData2D = xlsx.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
@@ -226,7 +248,7 @@ export async function POST(req: NextRequest) {
                 return NextResponse.json({ error: "لم يتم رصد أي درجات. يرجى التأكد من أن أسماء الطلاب في الملف تتطابق تماماً مع أسمائهم في النظام." }, { status: 400 });
             }
 
-            return NextResponse.json({ message: `تم تسجيل وتقسيم ${totalGradesInserted} درجة لكافة الطلاب في الملف بنجاح وبسرعة عالية بدون الاعتماد على الذكاء الاصطناعي!` }, { status: 200 });
+            return NextResponse.json({ message: `تم تسجيل وتقسيم ${totalGradesInserted} درجة لكافة الطلاب في الملف بنجاح وبسرعة عالية!` }, { status: 200 });
         }
 
         return NextResponse.json({ error: "بيانات غير مكتملة" }, { status: 400 });

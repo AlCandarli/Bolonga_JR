@@ -6,12 +6,34 @@ import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [code, setCode] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   const router = useRouter();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (code.trim()) {
-      router.push(`/student?code=${code}`);
+    if (!code.trim()) return;
+
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: code.trim() }),
+      });
+
+      if (response.ok) {
+        router.push("/student");
+      } else {
+        const data = await response.json();
+        setError(data.error || "Invalid code");
+      }
+    } catch (err) {
+      setError("Connection error. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -68,15 +90,31 @@ export default function LoginPage() {
               <div className="absolute bottom-[-1px] left-1/2 -translate-x-1/2 w-0 h-[2px] bg-brand-primary group-focus-within/input:w-3/4 transition-all duration-300 ease-out shadow-[0_0_10px_#00E5FF]" />
             </div>
 
+            {error && (
+              <p className="text-red-400 text-sm text-center font-bold animate-pulse -mt-2">
+                {error}
+              </p>
+            )}
+
             <button
               type="submit"
-              className="relative w-full h-16 bg-white hover:bg-brand-primary text-black font-extrabold text-lg sm:text-xl rounded-2xl shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(0,229,255,0.3)] transition-all duration-300 active:scale-[0.97] flex items-center justify-center overflow-hidden"
+              disabled={isLoading}
+              className="relative w-full h-16 bg-white hover:bg-brand-primary text-black font-extrabold text-lg sm:text-xl rounded-2xl shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(0,229,255,0.3)] transition-all duration-300 active:scale-[0.97] flex items-center justify-center overflow-hidden disabled:opacity-50"
             >
               <span className="relative z-10 flex items-center">
-                Login
-                <svg className="w-6 h-6 mr-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-                </svg>
+                {isLoading ? (
+                   <svg className="animate-spin h-6 w-6 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                   </svg>
+                ) : (
+                  <>
+                    Login
+                    <svg className="w-6 h-6 mr-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                    </svg>
+                  </>
+                )}
               </span>
             </button>
           </form>

@@ -1,12 +1,11 @@
 // إعدادات Prisma لإنشاء الأكواد البرمجية
 generator client {
-  provider   = "prisma-client-js"
-  engineType = "library"
+  provider = "prisma-client-js"
 }
 
-// تحديد نوع قاعدة البيانات ومكانها (SQLite)
+// تحديد نوع قاعدة البيانات ومكانها (PostgreSQL)
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 

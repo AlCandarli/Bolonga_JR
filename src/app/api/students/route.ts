@@ -1,13 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getSession } from "@/lib/session";
 
 export async function POST(req: NextRequest) {
   try {
+    const session = await getSession();
+    if (!session || session.role !== 'admin') {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const body = await req.json();
     const { code, name } = body;
 
     if (!code || !name) {
       return NextResponse.json({ error: "Please provide student name and code" }, { status: 400 });
+    }
+
+    if (String(name).length > 255 || String(code).length > 100) {
+      return NextResponse.json({ error: "Input too long." }, { status: 400 });
     }
 
     const student = await prisma.student.upsert({
@@ -26,6 +35,10 @@ export async function POST(req: NextRequest) {
 // دالة لحذف طالب من خلال الكود
 export async function DELETE(req: NextRequest) {
   try {
+    const session = await getSession();
+    if (!session || session.role !== 'admin') {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const { searchParams } = new URL(req.url);
     const code = searchParams.get("code");
     if (!code) return NextResponse.json({ error: "Missing student code" }, { status: 400 });
@@ -40,6 +53,10 @@ export async function DELETE(req: NextRequest) {
 // دالة لجلب جميع الطلاب
 export async function GET() {
   try {
+    const session = await getSession();
+    if (!session || session.role !== 'admin') {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const students = await prisma.student.findMany({
       orderBy: { name: 'asc' },
       select: { code: true, name: true }

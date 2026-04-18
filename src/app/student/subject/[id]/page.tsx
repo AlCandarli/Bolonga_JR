@@ -14,13 +14,10 @@ type DashboardData = { studentName: string; studentCode: string; subjects: Subje
 
 function SubjectContent() {
     const router = useRouter();
-    const searchParams = useSearchParams();
     const params = useParams<{ id: string }>();
-    
     const { t, dir, language } = useLanguage();
 
     const id = params?.id;
-    const code = searchParams?.get("code");
 
     const [isMounted, setIsMounted] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -30,14 +27,13 @@ function SubjectContent() {
 
     useEffect(() => {
         setIsMounted(true);
-        if (!code || !id) {
-            if (!code) router.push("/");
+        if (!id) {
             return;
         }
 
         const fetchDashboard = async () => {
             try {
-                const res = await fetch(`/api/student/dashboard?code=${code}`);
+                const res = await fetch(`/api/student/dashboard`);
                 const result = await res.json();
                 
                 if (res.ok) {
@@ -60,7 +56,7 @@ function SubjectContent() {
         };
 
         fetchDashboard();
-    }, [code, id, router, t]);
+    }, [id, router, t]);
 
     if (!isMounted) return null;
 
@@ -73,7 +69,7 @@ function SubjectContent() {
                     </div>
                     <h2 className="text-2xl font-black mb-2 tracking-tight text-white">{t('access_denied')}</h2>
                     <p className="text-white/40 font-medium mb-8 text-sm">{error}</p>
-                    <button onClick={() => router.push(`/student?code=${code}`)} className="w-full h-14 bg-white/10 hover:bg-white text-white hover:text-black font-bold rounded-2xl transition-all duration-300">
+                    <button onClick={() => router.push(`/student`)} className="w-full h-14 bg-white/10 hover:bg-white text-white hover:text-black font-bold rounded-2xl transition-all duration-300">
                         {t('back')}
                     </button>
                 </div>
@@ -134,7 +130,7 @@ function SubjectContent() {
                             {t('download_pdf')}
                         </button>
                         <button 
-                            onClick={() => router.push(`/student?code=${code}`)}
+                            onClick={() => router.push(`/student`)}
                             className="px-4 py-2.5 text-xs sm:text-sm font-bold bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl transition-all active:scale-95 text-white/60 hover:text-white backdrop-blur-sm group flex items-center gap-2"
                         >
                             {dir === 'rtl' ? <ArrowRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />}

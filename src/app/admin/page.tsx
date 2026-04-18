@@ -11,6 +11,21 @@ export default function AdminPage() {
 
     useEffect(() => {
         setIsMounted(true);
+        // Check if already authenticated via cookie
+        const checkAuth = async () => {
+            try {
+                const res = await fetch("/api/auth/me");
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.role === 'admin') {
+                        setIsAuthenticated(true);
+                    }
+                }
+            } catch (e) {
+                console.error("Session check failed");
+            }
+        };
+        checkAuth();
     }, []);
 
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -154,15 +169,33 @@ export default function AdminPage() {
         }
     };
 
-    const ADMIN_PASSWORD = "123";
 
-    const handleAdminLogin = (e: React.FormEvent) => {
+    const handleAdminLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (password === ADMIN_PASSWORD) {
-            setIsAuthenticated(true);
-            setError("");
-        } else {
-            setError("Invalid password. Please try again.");
+        setError("");
+        try {
+            const res = await fetch("/api/auth", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ password }),
+            });
+            if (res.ok) {
+                setIsAuthenticated(true);
+            } else {
+                setError("Invalid password. Please try again.");
+            }
+        } catch {
+            setError("Server error. Please try again later.");
+        }
+    };
+
+    const handleLogout = async () => {
+        try {
+            await fetch('/api/auth/logout', { method: 'POST' });
+            setIsAuthenticated(false);
+            router.push('/');
+        } catch (e) {
+            router.push('/');
         }
     };
 
@@ -391,7 +424,7 @@ export default function AdminPage() {
                         <p className="text-[10px] text-white/40 mt-0.5 font-medium tracking-widest uppercase">Admin Management</p>
                     </div>
                 </div>
-                <button onClick={() => setIsAuthenticated(false)} className="px-4 py-2 text-xs sm:text-sm font-bold bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl transition-all active:scale-95 text-white/60 hover:text-red-400 backdrop-blur-sm">
+                <button onClick={handleLogout} className="px-4 py-2 text-xs sm:text-sm font-bold bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl transition-all active:scale-95 text-white/60 hover:text-red-400 backdrop-blur-sm">
                     Logout
                 </button>
             </nav>

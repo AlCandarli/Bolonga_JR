@@ -24,6 +24,17 @@
 .DS_Store
 *.pem
 
+# databases — never commit db files
+*.db
+*.db-shm
+*.db-wal
+dev.db
+prisma/dev.db
+
+# scratch & test files
+scratch.txt
+test_upload.xlsx
+
 # debug
 npm-debug.log*
 yarn-debug.log*
