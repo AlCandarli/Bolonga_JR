@@ -13,7 +13,7 @@ type DashboardData = { studentName: string; studentCode: string; subjects: Subje
 
 function DashboardContent() {
     const router = useRouter();
-    
+
     const { t } = useLanguage();
 
     const [isMounted, setIsMounted] = useState(false);
@@ -30,7 +30,7 @@ function DashboardContent() {
             try {
                 const res = await fetch(`/api/student/dashboard`);
                 const result = await res.json();
-                
+
                 if (res.ok) {
                     setData(result);
                 } else {
@@ -67,7 +67,7 @@ function DashboardContent() {
         const enhancedSubjects = data.subjects.map((sub) => {
             const latestGrade = sub.grades.length > 0 ? sub.grades[0] : null;
             const scoreNum = latestGrade ? parseFloat(latestGrade.score) : NaN;
-            
+
             if (!isNaN(scoreNum)) {
                 totalScore += scoreNum;
                 count++;
@@ -78,13 +78,13 @@ function DashboardContent() {
 
         // Filtering - Only search query now
         const filteredSubjects = enhancedSubjects.filter(sub => {
-            return sub.subjectName.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                   sub.subjectId.toLowerCase().includes(searchQuery.toLowerCase());
+            return sub.subjectName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                sub.subjectId.toLowerCase().includes(searchQuery.toLowerCase());
         });
 
         // Average score (Raw value, displayed out of 50 in UI)
         const avgScore = count > 0 ? (totalScore / count) : 0;
-        
+
         return {
             gpa: avgScore.toFixed(1),
             credits: data.subjects.length * 3, // Mock 3 credits per subject
@@ -128,7 +128,7 @@ function DashboardContent() {
 
     return (
         <main className={`relative min-h-screen w-full flex flex-col overflow-x-hidden bg-slate-950 text-slate-200 transition-opacity duration-1000 ease-out opacity-100`} dir="ltr">
-            
+
             {/* Cinematic Layout Background */}
             <div className="fixed top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
                 <div className="absolute top-[-20%] right-[-10%] w-[60vw] h-[60vw] rounded-full bg-brand-primary opacity-10 blur-[140px] animate-pulse" style={{ animationDuration: '10s' }} />
@@ -161,11 +161,11 @@ function DashboardContent() {
 
             {/* Dashboard Body Container */}
             <div className="relative z-10 flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
-                
+
                 {/* Top Section */}
                 <div className="mb-10 w-full animate-in fade-in slide-in-from-bottom-4 duration-500">
                     <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-6">{t('academic_overview')}</h2>
-                    
+
                     {/* Top Stats Row */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                         {/* Overall GPA Card */}
@@ -197,9 +197,9 @@ function DashboardContent() {
                 {/* Controls Section */}
                 <div className="flex flex-col sm:flex-row gap-4 mb-8">
                     <div className="relative flex-1 group">
-                        <input 
-                            type="text" 
-                            placeholder={t('search_placeholder')} 
+                        <input
+                            type="text"
+                            placeholder={t('search_placeholder')}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className={`w-full h-14 bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 text-white placeholder:text-white/30 focus:outline-none focus:border-brand-primary/50 focus:bg-white/10 transition-all font-medium shadow-inner`}
@@ -228,9 +228,9 @@ function DashboardContent() {
                             const isNoGrade = isNaN(sub.scoreNum);
 
                             const progressWidth = isNoGrade ? "0%" : `${Math.min(100, Math.max(0, sub.scoreNum))}%`;
-                            
+
                             return (
-                                <div 
+                                <div
                                     key={sub.subjectId}
                                     onClick={() => router.push('/student/subject/' + sub.subjectId)}
                                     className="group flex flex-col h-full rounded-2xl bg-white/[0.02] hover:bg-white/[0.04] border border-white/10 hover:border-brand-primary/40 shadow-lg hover:shadow-[0_8px_30px_rgba(0,229,255,0.15)] p-6 cursor-pointer transition-all duration-300 hover:-translate-y-1 overflow-hidden relative animate-in fade-in slide-in-from-bottom-8"
@@ -240,12 +240,9 @@ function DashboardContent() {
                                         <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center group-hover:scale-110 group-hover:bg-brand-primary/10 transition-transform duration-300">
                                             <BookOpen className="w-6 h-6 text-white/50 group-hover:text-brand-primary transition-colors" />
                                         </div>
-                                        {/* Status Badge */}
-                                        <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${isPassing ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : isFailing ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' : 'bg-white/5 text-white/40 border border-white/10'}`}>
-                                            {isPassing ? t('pass') : isFailing ? t('fail') : t('no_grade')}
-                                        </div>
+
                                     </div>
-                                    
+
                                     <h3 className="text-xl font-bold text-white mb-1 group-hover:text-brand-primary transition-colors line-clamp-1">
                                         {sub.subjectName}
                                     </h3>
@@ -263,7 +260,7 @@ function DashboardContent() {
                                                 </div>
                                                 <div className="text-right">
                                                     <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider mb-1">{t('score')}</p>
-                                                    <p className={`text-xl font-black ${isPassing ? 'text-emerald-400' : 'text-rose-400'}`}>{sub.latestGrade.score}</p>
+                                                    <p className="text-xl font-black text-white">{sub.latestGrade.score}</p>
                                                 </div>
                                             </div>
                                         ) : (
@@ -272,14 +269,6 @@ function DashboardContent() {
                                                 <p className="text-sm font-semibold text-yellow-500/80">{t('pending_assessment')}</p>
                                             </div>
                                         )}
-
-                                        {/* Progress Bar UI */}
-                                        <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden flex">
-                                            <div 
-                                                className={`h-full rounded-full transition-all duration-1000 ease-out ${isPassing ? 'bg-emerald-500' : isFailing ? 'bg-rose-500' : 'bg-transparent'}`}
-                                                style={{ width: progressWidth }}
-                                            />
-                                        </div>
                                     </div>
                                 </div>
                             );

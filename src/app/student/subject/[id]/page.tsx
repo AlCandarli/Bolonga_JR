@@ -34,7 +34,7 @@ function SubjectContent() {
             try {
                 const res = await fetch(`/api/student/dashboard`);
                 const result = await res.json();
-                
+
                 if (res.ok) {
                     setData(result);
                     const found = result.subjects.find((s: SubjectData) => s.subjectId === id);
@@ -120,14 +120,14 @@ function SubjectContent() {
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
-                        <button 
+                        <button
                             onClick={() => window.print()}
                             className="hidden sm:flex items-center gap-2 px-4 py-2.5 text-sm font-bold bg-brand-primary/10 hover:bg-brand-primary/20 border border-brand-primary/20 rounded-xl transition-all active:scale-95 text-brand-primary backdrop-blur-sm group"
                         >
                             <Download className="w-4 h-4" />
                             {t('download_pdf')}
                         </button>
-                        <button 
+                        <button
                             onClick={() => router.push(`/student`)}
                             className="px-4 py-2.5 text-xs sm:text-sm font-bold bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl transition-all active:scale-95 text-white/60 hover:text-white backdrop-blur-sm group flex items-center gap-2"
                         >
@@ -140,7 +140,7 @@ function SubjectContent() {
 
             {/* Main Content Area */}
             <div className={`relative z-10 flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 flex flex-col`}>
-                
+
                 {/* Header Information */}
                 <div className="mb-10 animate-in fade-in slide-in-from-bottom-4 duration-500 print:hidden">
                     <div className="flex items-center gap-4 mb-4">
@@ -157,7 +157,7 @@ function SubjectContent() {
                 </div>
 
                 {/* Mobile-only download button */}
-                <button 
+                <button
                     onClick={() => window.print()}
                     className="sm:hidden w-full flex items-center justify-center gap-2 mb-8 px-4 py-4 text-sm font-bold bg-brand-primary/10 hover:bg-brand-primary/20 border border-brand-primary/20 rounded-2xl text-brand-primary transition-all active:scale-95 print:hidden"
                 >
@@ -181,8 +181,8 @@ function SubjectContent() {
                                 const isPassing = !isNaN(scoreNum) && scoreNum >= 25; // Scale is now out of 50
 
                                 return (
-                                    <div 
-                                        key={grade.id} 
+                                    <div
+                                        key={grade.id}
                                         className="group relative flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white/[0.03] hover:bg-white/[0.05] border border-white/5 hover:border-brand-primary/30 rounded-2xl p-6 transition-all duration-300 animate-in fade-in slide-in-from-bottom-8 print:bg-transparent print:border-b print:border-gray-100 print:rounded-none"
                                         style={{ animationDelay: `${idx * 100}ms`, animationFillMode: 'both' }}
                                     >
@@ -197,19 +197,15 @@ function SubjectContent() {
                                                 {dateStr}
                                             </p>
                                         </div>
-                                        
-                                        <div className="flex items-center gap-6 w-full sm:w-auto">
-                                            {/* Passing Status Badge (Visible on Web) */}
-                                            <div className={`hidden sm:block px-3 py-1 rounded-full text-[10px] font-black tracking-wider uppercase border print:hidden transition-all ${isPassing ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'}`}>
-                                                {isPassing ? t('pass') : t('fail')}
-                                            </div>
 
-                                            <div className={`w-full sm:w-28 py-3 rounded-2xl flex flex-col items-center justify-center border transition-all ${isPassing ? 'bg-emerald-500/5 border-emerald-500/10 group-hover:border-emerald-500/30' : 'bg-rose-500/5 border-rose-500/10 group-hover:border-rose-500/30'} print:bg-transparent print:border-none`}>
+                                        <div className="flex items-center gap-6 w-full sm:w-auto">
+                                            <div className="w-full sm:w-28 py-3 rounded-2xl flex flex-col items-center justify-center border bg-white/5 border-white/10 group-hover:border-white/30 transition-all print:bg-transparent print:border-none">
                                                 <span className="text-[10px] text-white/30 font-black uppercase tracking-widest mb-1 print:hidden">{t('score')}</span>
-                                                <span className={`text-3xl font-black ${isPassing ? 'text-emerald-400' : 'text-rose-400'} print:text-black`}>
+                                                <span className="text-3xl font-black text-white print:text-black">
                                                     {grade.score}
                                                 </span>
                                             </div>
+
                                         </div>
                                     </div>
                                 );
@@ -218,7 +214,7 @@ function SubjectContent() {
                     )}
                 </div>
             </div>
-            
+
             <style jsx global>{`
                 @media print {
                     body { background: white !important; }
