@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { Search, ChevronDown, BookOpen, TrendingUp, Award, Clock } from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
+
 
 // Types
 type Grade = { id: string; examName: string; score: string; date: string; };
@@ -14,7 +14,7 @@ type DashboardData = { studentName: string; studentCode: string; subjects: Subje
 function DashboardContent() {
     const router = useRouter();
 
-    const { t } = useLanguage();
+
 
     const [isMounted, setIsMounted] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -34,18 +34,18 @@ function DashboardContent() {
                 if (res.ok) {
                     setData(result);
                 } else {
-                    setError(result.error || t('access_denied'));
+                    setError(result.error || "Access Denied");
                 }
             } catch (err) {
                 console.error(err);
-                setError(t('access_denied'));
+                setError("Access Denied");
             } finally {
                 setIsLoading(false);
             }
         };
 
         fetchDashboard();
-    }, [router, t]);
+    }, [router]);
 
     const handleLogout = async () => {
         try {
@@ -102,10 +102,10 @@ function DashboardContent() {
                     <div className="w-20 h-20 mx-auto rounded-full bg-red-500/10 flex items-center justify-center mb-6 border border-red-500/20">
                         <svg className="w-10 h-10 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                     </div>
-                    <h2 className="text-2xl font-black mb-2 tracking-tight text-white">{t('access_denied')}</h2>
+                    <h2 className="text-2xl font-black mb-2 tracking-tight text-white">Access Denied</h2>
                     <p className="text-white/40 font-medium mb-8 text-sm">{error}</p>
                     <button onClick={() => router.push('/')} className="w-full h-14 bg-white/10 hover:bg-white text-white hover:text-black font-bold rounded-2xl transition-all duration-300">
-                        {t('return_login')}
+                        Return to Login
                     </button>
                 </div>
             </main>
@@ -143,15 +143,15 @@ function DashboardContent() {
                             <Image src="/logo.png" alt="Bologna JR" fill sizes="(max-width: 768px) 48px, 56px" className="object-cover rounded-full" priority />
                         </div>
                         <div className="flex flex-col justify-center">
-                            <p className="text-[10px] sm:text-xs text-brand-primary font-bold tracking-widest uppercase mb-0.5">{t('welcome_back')}</p>
+                            <p className="text-[10px] sm:text-xs text-brand-primary font-bold tracking-widest uppercase mb-0.5">Welcome Back</p>
                             <h1 className="text-base sm:text-2xl font-black text-white tracking-tight drop-shadow-md truncate max-w-[200px] sm:max-w-none">{data.studentName}</h1>
-                            <span className="text-[10px] text-white/40 font-medium tracking-widest uppercase mt-0.5">{t('id')}: {data.studentCode}</span>
+                            <span className="text-[10px] text-white/40 font-medium tracking-widest uppercase mt-0.5">ID: {data.studentCode}</span>
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
                         <button onClick={handleLogout} className="px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-bold bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl transition-all active:scale-95 text-white/60 hover:text-white backdrop-blur-sm group">
                             <span className="flex items-center gap-2">
-                                {t('logout')}
+                                Logout
                                 <svg className={`w-4 h-4 opacity-50 group-hover:opacity-100 transition-opacity`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                             </span>
                         </button>
@@ -164,7 +164,7 @@ function DashboardContent() {
 
                 {/* Top Section */}
                 <div className="mb-10 w-full animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-6">{t('academic_overview')}</h2>
+                    <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-6">Academic Overview</h2>
 
                     {/* Top Stats Row */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
@@ -175,7 +175,7 @@ function DashboardContent() {
                                 <TrendingUp className="w-7 h-7 text-brand-primary" />
                             </div>
                             <div>
-                                <p className="text-sm text-white/50 font-bold tracking-widest uppercase mb-1">{t('average_score')}</p>
+                                <p className="text-sm text-white/50 font-bold tracking-widest uppercase mb-1">Average Score</p>
                                 <h3 className="text-3xl font-black text-white">{processedStats.gpa} <span className="text-lg text-white/30 font-medium">/ 50</span></h3>
                             </div>
                         </div>
@@ -187,7 +187,7 @@ function DashboardContent() {
                                 <BookOpen className="w-6 h-6 text-indigo-400" />
                             </div>
                             <div>
-                                <p className="text-sm text-white/50 font-bold tracking-widest uppercase mb-1">{t('enrolled_modules')}</p>
+                                <p className="text-sm text-white/50 font-bold tracking-widest uppercase mb-1">Enrolled Modules</p>
                                 <h3 className="text-3xl font-black text-white">{processedStats.modules}</h3>
                             </div>
                         </div>
@@ -199,7 +199,7 @@ function DashboardContent() {
                     <div className="relative flex-1 group">
                         <input
                             type="text"
-                            placeholder={t('search_placeholder')}
+                            placeholder="Search subjects by name or code..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className={`w-full h-14 bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 text-white placeholder:text-white/30 focus:outline-none focus:border-brand-primary/50 focus:bg-white/10 transition-all font-medium shadow-inner`}
@@ -211,14 +211,14 @@ function DashboardContent() {
                 {data.subjects.length === 0 ? (
                     <div className="w-full py-24 flex flex-col items-center justify-center border border-white/5 bg-white/[0.02] rounded-3xl backdrop-blur-md">
                         <Clock className="w-16 h-16 text-white/10 mb-5" />
-                        <h3 className="text-2xl font-bold text-white/60 mb-2">{t('no_records_title')}</h3>
-                        <p className="text-white/40 text-center max-w-sm">{t('no_records_desc')}</p>
+                        <h3 className="text-2xl font-bold text-white/60 mb-2">No Academic Records</h3>
+                        <p className="text-white/40 text-center max-w-sm">There are no grades uploaded to your profile yet. Please check back after exams.</p>
                     </div>
                 ) : processedStats.filteredSubjects.length === 0 ? (
                     <div className="w-full py-20 flex flex-col items-center justify-center border border-white/5 bg-white/[0.02] rounded-3xl backdrop-blur-md">
                         <Search className="w-12 h-12 text-white/10 mb-4" />
-                        <h3 className="text-xl font-bold text-white/60 mb-1">{t('no_matches_title')}</h3>
-                        <p className="text-sm text-white/40 text-center">{t('no_matches_desc')}</p>
+                        <h3 className="text-xl font-bold text-white/60 mb-1">No matches found</h3>
+                        <p className="text-sm text-white/40 text-center">Try adjusting your search query or semester filter.</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6">
@@ -255,18 +255,18 @@ function DashboardContent() {
                                         {sub.latestGrade ? (
                                             <div className="flex justify-between items-end mb-2">
                                                 <div>
-                                                    <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider mb-1">{t('latest_entry')}</p>
+                                                    <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider mb-1">Latest Entry</p>
                                                     <p className="text-sm font-semibold text-white/90 line-clamp-1">{sub.latestGrade.examName}</p>
                                                 </div>
                                                 <div className="text-right">
-                                                    <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider mb-1">{t('score')}</p>
+                                                    <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider mb-1">Score</p>
                                                     <p className="text-xl font-black text-white">{sub.latestGrade.score}</p>
                                                 </div>
                                             </div>
                                         ) : (
                                             <div className="mb-4">
-                                                <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider mb-1">{t('status')}</p>
-                                                <p className="text-sm font-semibold text-yellow-500/80">{t('pending_assessment')}</p>
+                                                <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider mb-1">Status</p>
+                                                <p className="text-sm font-semibold text-yellow-500/80">Pending Assessment</p>
                                             </div>
                                         )}
                                     </div>

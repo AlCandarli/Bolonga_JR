@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams, useParams } from "next/navigation";
 import Image from "next/image";
 import { Download, FileText, AlertCircle, ArrowLeft, ArrowRight } from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
+
 
 // Types
 type Grade = { id: string; examName: string; score: string; date: string; };
@@ -14,7 +14,7 @@ type DashboardData = { studentName: string; studentCode: string; subjects: Subje
 function SubjectContent() {
     const router = useRouter();
     const params = useParams<{ id: string }>();
-    const { t } = useLanguage();
+
 
     const id = params?.id;
 
@@ -41,21 +41,21 @@ function SubjectContent() {
                     if (found) {
                         setSubject(found);
                     } else {
-                        setError(t('no_grades_module'));
+                        setError("No grade entries available for this module.");
                     }
                 } else {
-                    setError(result.error || t('access_denied'));
+                    setError(result.error || "Access Denied");
                 }
             } catch (err) {
                 console.error(err);
-                setError(t('access_denied'));
+                setError("Access Denied");
             } finally {
                 setIsLoading(false);
             }
         };
 
         fetchDashboard();
-    }, [id, router, t]);
+    }, [id, router]);
 
     if (!isMounted) return null;
 
@@ -66,10 +66,10 @@ function SubjectContent() {
                     <div className="w-20 h-20 mx-auto rounded-full bg-red-500/10 flex items-center justify-center mb-6 border border-red-500/20">
                         <AlertCircle className="w-10 h-10 text-red-500" />
                     </div>
-                    <h2 className="text-2xl font-black mb-2 tracking-tight text-white">{t('access_denied')}</h2>
+                    <h2 className="text-2xl font-black mb-2 tracking-tight text-white">Access Denied</h2>
                     <p className="text-white/40 font-medium mb-8 text-sm">{error}</p>
                     <button onClick={() => router.push(`/student`)} className="w-full h-14 bg-white/10 hover:bg-white text-white hover:text-black font-bold rounded-2xl transition-all duration-300">
-                        {t('back')}
+                        Back
                     </button>
                 </div>
             </main>
@@ -99,11 +99,11 @@ function SubjectContent() {
 
             {/* Print Header (Visible ONLY on print) */}
             <div className="hidden print:flex flex-col items-center justify-center w-full pb-8 pt-4 border-b border-gray-200 mb-8 text-black">
-                <h1 className="text-3xl font-black">{t('official_report')}</h1>
+                <h1 className="text-3xl font-black">Official Grade Report</h1>
                 <div className="mt-6 space-y-2 text-center text-sm font-medium text-gray-600">
-                    <p>{t('student_name')}: <span className="text-black font-bold">{data.studentName}</span></p>
-                    <p>{t('student_code')}: <span className="text-black font-bold">{data.studentCode}</span></p>
-                    <p className="mt-4">{t('module')}: <span className="font-bold text-black">{subject.subjectName} ({subject.subjectId})</span></p>
+                    <p>Student Name: <span className="text-black font-bold">{data.studentName}</span></p>
+                    <p>Student Code: <span className="text-black font-bold">{data.studentCode}</span></p>
+                    <p className="mt-4">Module: <span className="font-bold text-black">{subject.subjectName} ({subject.subjectId})</span></p>
                 </div>
             </div>
 
@@ -116,7 +116,7 @@ function SubjectContent() {
                         </div>
                         <div className="flex flex-col justify-center">
                             <h1 className="text-base sm:text-2xl font-black text-white tracking-tight drop-shadow-md truncate max-w-[150px] sm:max-w-none">{data.studentName}</h1>
-                            <span className="text-[10px] text-white/40 font-medium tracking-widest uppercase mt-0.5">{t('id')}: {data.studentCode}</span>
+                            <span className="text-[10px] text-white/40 font-medium tracking-widest uppercase mt-0.5">ID: {data.studentCode}</span>
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
@@ -125,14 +125,14 @@ function SubjectContent() {
                             className="hidden sm:flex items-center gap-2 px-4 py-2.5 text-sm font-bold bg-brand-primary/10 hover:bg-brand-primary/20 border border-brand-primary/20 rounded-xl transition-all active:scale-95 text-brand-primary backdrop-blur-sm group"
                         >
                             <Download className="w-4 h-4" />
-                            {t('download_pdf')}
+                            Download PDF
                         </button>
                         <button
                             onClick={() => router.push(`/student`)}
                             className="px-4 py-2.5 text-xs sm:text-sm font-bold bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl transition-all active:scale-95 text-white/60 hover:text-white backdrop-blur-sm group flex items-center gap-2"
                         >
                             <ArrowLeft className="w-4 h-4" />
-                            {t('back')}
+                            Back
                         </button>
                     </div>
                 </div>
@@ -152,7 +152,7 @@ function SubjectContent() {
                         {subject.subjectName}
                     </h2>
                     <p className="text-sm sm:text-base text-white/40 font-medium max-w-2xl leading-relaxed">
-                        {t('module_record_desc')}
+                        Complete academic record for this module. You can securely download a copy of these grades for your records.
                     </p>
                 </div>
 
@@ -162,7 +162,7 @@ function SubjectContent() {
                     className="sm:hidden w-full flex items-center justify-center gap-2 mb-8 px-4 py-4 text-sm font-bold bg-brand-primary/10 hover:bg-brand-primary/20 border border-brand-primary/20 rounded-2xl text-brand-primary transition-all active:scale-95 print:hidden"
                 >
                     <Download className="w-5 h-5" />
-                    {t('download_pdf')}
+                    Download PDF
                 </button>
 
                 {/* Grades Container */}
@@ -170,7 +170,7 @@ function SubjectContent() {
                     {subject.grades.length === 0 ? (
                         <div className="py-24 flex flex-col items-center justify-center">
                             <FileText className="w-16 h-16 text-white/10 mb-5" />
-                            <p className="text-white/40 font-bold text-lg text-center max-w-xs">{t('no_grades_module')}</p>
+                            <p className="text-white/40 font-bold text-lg text-center max-w-xs">No grade entries available for this module.</p>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 gap-4 sm:gap-6">
@@ -200,7 +200,7 @@ function SubjectContent() {
 
                                         <div className="flex items-center gap-6 w-full sm:w-auto">
                                             <div className="w-full sm:w-28 py-3 rounded-2xl flex flex-col items-center justify-center border bg-white/5 border-white/10 group-hover:border-white/30 transition-all print:bg-transparent print:border-none">
-                                                <span className="text-[10px] text-white/30 font-black uppercase tracking-widest mb-1 print:hidden">{t('score')}</span>
+                                                <span className="text-[10px] text-white/30 font-black uppercase tracking-widest mb-1 print:hidden">Score</span>
                                                 <span className="text-3xl font-black text-white print:text-black">
                                                     {grade.score}
                                                 </span>

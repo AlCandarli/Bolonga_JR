@@ -3,14 +3,14 @@
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useLanguage } from "@/contexts/LanguageContext";
+
 
 export default function LoginPage() {
   const [code, setCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
-  const { t, dir } = useLanguage();
+
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,7 +72,7 @@ export default function LoginPage() {
                 Bologna JR
               </h1>
               <p className="text-xs sm:text-sm text-white/40 mt-1.5 font-medium tracking-wide">
-                {t('smart_portal')}
+                The smart portal to get your results
               </p>
             </div>
           </div>
@@ -84,7 +84,7 @@ export default function LoginPage() {
                 type="text"
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                placeholder={t('enter_code_placeholder')}
+                placeholder="Enter your code..."
                 className="w-full h-16 bg-black/30 border border-white/10 rounded-2xl px-6 text-0.5xl text-center text-white placeholder:text-white/20 focus:outline-none focus:bg-white/5 focus:border-brand-primary/50 transition-all font-bold tracking-[0.2em] shadow-inner backdrop-blur-sm " style={{ direction: 'ltr' }}
                 required
                 autoComplete="off"
@@ -111,7 +111,7 @@ export default function LoginPage() {
                    </svg>
                 ) : (
                   <>
-                    {t('login')}
+                    Login
                     <svg className="w-6 h-6 ml-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
                     </svg>
@@ -126,7 +126,7 @@ export default function LoginPage() {
               onClick={() => router.push('/admin')}
               className="text-white/30 hover:text-white/80 text-xs sm:text-sm font-medium transition-colors"
             >
-              {t('admin_login')}
+              Admin Login
             </button>
           </div>
         </div>
