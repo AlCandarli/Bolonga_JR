@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
         const file = formData.get("file") as File;
         const uploadMode = formData.get("uploadMode") as string;
         const subjectCode = formData.get("subjectCode") as string;
-        const examName = formData.get("examName") as string;
+        const divisionId = formData.get("divisionId") as string;
 
         if (!file) {
             return NextResponse.json({ error: "لم يتم العثور على ملف!" }, { status: 400 });
@@ -52,6 +52,7 @@ export async function POST(req: NextRequest) {
         if (uploadMode === "complete") {
             const rawData2D = xlsx.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
             let addedCount = 0;
+            const operations = [];
 
             for (const row of rawData2D) {
                 if (!row || row.length < 2) continue;
@@ -78,16 +79,25 @@ export async function POST(req: NextRequest) {
 
                 if (!studentCode || !studentName || studentCode === 'undefined' || studentName === 'undefined') continue;
 
-                await prisma.student.upsert({
-                    where: { code: studentCode },
-                    update: { name: studentName },
-                    create: { code: studentCode, name: studentName },
-                });
+                operations.push(
+                    prisma.student.upsert({
+                        where: { code: studentCode },
+                        update: { name: studentName },
+                        create: { code: studentCode, name: studentName },
+                    })
+                );
                 addedCount++;
             }
 
             if (addedCount === 0 && rawData2D.length > 0) {
                 return NextResponse.json({ error: "لم يتم العثور على أي بيانات خاضعة لشروط التسجيل! تأكد من الملف الخاص بك." }, { status: 400 });
+            }
+
+            // Execute in chunks to avoid Vercel timeouts and database connection limits
+            const CHUNK_SIZE = 500;
+            for (let i = 0; i < operations.length; i += CHUNK_SIZE) {
+                const chunk = operations.slice(i, i + CHUNK_SIZE);
+                await prisma.$transaction(chunk);
             }
 
             return NextResponse.json({ message: `تم تسجيل ${addedCount} طالب بنجاح!` }, { status: 200 });
@@ -97,8 +107,17 @@ export async function POST(req: NextRequest) {
         // الحالة الثانية: رفع الدرجات (Specific Exam)
         // العناوين المطلوبة في الصف الأول: Code, Score
         // -------------------------------------------------------------
-        if (uploadMode === "specific" && subjectCode && examName) {
+        if (uploadMode === "specific" && subjectCode && divisionId) {
             let gradesCount = 0;
+            const operations = [];
+
+            // Fetch all students to avoid querying in a loop
+            const allStudentsArray = await prisma.student.findMany();
+            const studentCodeMap = new Map<string, string>();
+            for (const s of allStudentsArray) {
+                studentCodeMap.set(s.code, s.id);
+            }
+
             for (const rawRow of rawData) {
                 const row = Object.keys(rawRow).reduce((acc: any, key) => {
                     acc[key.trim().toLowerCase()] = rawRow[key];
@@ -111,33 +130,41 @@ export async function POST(req: NextRequest) {
                 if (valCode === undefined || valScore === undefined) continue;
 
                 const studentCode = String(valCode).trim();
-                const score = String(valScore).trim();
+                const scoreStr = String(valScore).trim();
+                
+                const scoreNum = parseFloat(scoreStr);
 
-                if (!studentCode || !score) continue;
+                if (!studentCode || isNaN(scoreNum)) continue;
 
-                const student = await prisma.student.findUnique({
-                    where: { code: studentCode }
-                });
+                const studentId = studentCodeMap.get(studentCode);
 
-                if (student) {
-                    await prisma.grade.upsert({
-                        where: {
-                            studentId_subjectId_examName: {
-                                studentId: student.id,
-                                subjectId: subjectCode,
-                                examName: examName,
+                if (studentId) {
+                    operations.push(
+                        prisma.grade.upsert({
+                            where: {
+                                studentId_divisionId: {
+                                    studentId: studentId,
+                                    divisionId: divisionId,
+                                },
                             },
-                        },
-                        update: { score: score },
-                        create: {
-                            score: score,
-                            examName: examName,
-                            studentId: student.id,
-                            subjectId: subjectCode,
-                        },
-                    });
+                            update: { score: scoreNum },
+                            create: {
+                                score: scoreNum,
+                                studentId: studentId,
+                                subjectId: subjectCode,
+                                divisionId: divisionId,
+                            },
+                        })
+                    );
                     gradesCount++;
                 }
+            }
+
+            // Execute in chunks
+            const CHUNK_SIZE = 500;
+            for (let i = 0; i < operations.length; i += CHUNK_SIZE) {
+                const chunk = operations.slice(i, i + CHUNK_SIZE);
+                await prisma.$transaction(chunk);
             }
 
             // إذا كانت الملفات فيها بيانات ولكن لم يتم إضافة أي درجة
@@ -152,6 +179,21 @@ export async function POST(req: NextRequest) {
         // الحالة الثالثة: المعالجة السريعة (Fast Semantic Parsing)
         // -------------------------------------------------------------
         if (uploadMode === "semester" && subjectCode) {
+            // First we need to get the divisions for this subject to map them by name
+            const subjectObj = await prisma.subject.findUnique({
+                where: { id: subjectCode },
+                include: { divisions: true }
+            });
+            
+            if (!subjectObj || !subjectObj.divisions) {
+                return NextResponse.json({ error: "لا توجد أقسام مسجلة لهذه المادة." }, { status: 400 });
+            }
+            
+            const divisionsMap = new Map<string, string>();
+            for (const div of subjectObj.divisions) {
+                divisionsMap.set(div.name.toLowerCase().trim(), div.id);
+            }
+
             const rawData2D = xlsx.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
             
             // 1. Fetch all students rapidly to build a vector map
@@ -164,8 +206,10 @@ export async function POST(req: NextRequest) {
             }
 
             let totalGradesInserted = 0;
-            const validTextGrades = ["غائب", "مؤجل", "محروم", "معفى", "صفر", "غ"];
+            const validTextGrades = ["غائب", "مؤجل", "محروم", "معفى", "صفر", "غ"]; // Text grades are technically not floats, handled as 0 here.
             const skipHeaders = ["code", "id", "كود", "الكود", "الرمز", "رقم الطالب", "رقم التسجيل", "تسلسل", "م", "ت", "تولد"];
+
+            const operations = [];
 
             // 2. Scan infinite grid sequentially
             for (let i = 0; i < rawData2D.length; i++) {
@@ -202,10 +246,12 @@ export async function POST(req: NextRequest) {
                     // C. Verify this is a plausible Grade Entity.
                     const isNum = !isNaN(parseFloat(scoreStr)) && isFinite(Number(scoreStr));
                     const isValidText = validTextGrades.includes(scoreStr);
+                    
+                    const finalScore = isValidText ? 0 : parseFloat(scoreStr);
 
                     if (isNum || isValidText) {
                         // D. Vertical Raycast! Shoot upwards strictly in this column [j] to find the Header Tile.
-                        let examName = "امتحان عام";
+                        let examName = "";
                         for (let k = i - 1; k >= 0; k--) {
                             const headerRow = rawData2D[k];
                             if (headerRow && headerRow[j]) {
@@ -220,32 +266,56 @@ export async function POST(req: NextRequest) {
 
                         // Protect against capturing systemic headers as grading metrics.
                         if (skipHeaders.includes(examName.toLowerCase())) continue;
+                        
+                        // Map the parsed examName to our divisionId
+                        const normalizedExamName = examName.toLowerCase().trim();
+                        let targetDivisionId = divisionsMap.get(normalizedExamName);
+                        
+                        // If no direct match, try partial match or just skip
+                        if (!targetDivisionId) {
+                             for (const [key, id] of divisionsMap.entries()) {
+                                 if (normalizedExamName.includes(key) || key.includes(normalizedExamName)) {
+                                     targetDivisionId = id;
+                                     break;
+                                 }
+                             }
+                        }
+                        
+                        if (targetDivisionId) {
+                            // E. Persist flawlessly exactly what we traced!
+                            operations.push(
+                                prisma.grade.upsert({
+                                    where: {
+                                        studentId_divisionId: {
+                                            studentId: matchedStudent.id,
+                                            divisionId: targetDivisionId,
+                                        },
+                                    },
+                                    update: { score: finalScore },
+                                    create: {
+                                        score: finalScore,
+                                        studentId: matchedStudent.id,
+                                        subjectId: subjectCode,
+                                        divisionId: targetDivisionId,
+                                    },
+                                })
+                            );
 
-                        // E. Persist flawlessly exactly what we traced!
-                        await prisma.grade.upsert({
-                            where: {
-                                studentId_subjectId_examName: {
-                                    studentId: matchedStudent.id,
-                                    subjectId: subjectCode,
-                                    examName: examName,
-                                },
-                            },
-                            update: { score: scoreStr },
-                            create: {
-                                score: scoreStr,
-                                examName: examName,
-                                studentId: matchedStudent.id,
-                                subjectId: subjectCode,
-                            },
-                        });
-
-                        totalGradesInserted++;
+                            totalGradesInserted++;
+                        }
                     }
                 }
             }
 
+            // Execute in chunks
+            const CHUNK_SIZE = 500;
+            for (let i = 0; i < operations.length; i += CHUNK_SIZE) {
+                const chunk = operations.slice(i, i + CHUNK_SIZE);
+                await prisma.$transaction(chunk);
+            }
+
             if (totalGradesInserted === 0) {
-                return NextResponse.json({ error: "لم يتم رصد أي درجات. يرجى التأكد من أن أسماء الطلاب في الملف تتطابق تماماً مع أسمائهم في النظام." }, { status: 400 });
+                return NextResponse.json({ error: "لم يتم رصد أي درجات أو لم يتم مطابقة العناوين مع أقسام المادة. يرجى التأكد من أن أسماء الأعمدة تطابق أسماء أقسام المادة." }, { status: 400 });
             }
 
             return NextResponse.json({ message: `تم تسجيل وتقسيم ${totalGradesInserted} درجة لكافة الطلاب في الملف بنجاح وبسرعة عالية!` }, { status: 200 });

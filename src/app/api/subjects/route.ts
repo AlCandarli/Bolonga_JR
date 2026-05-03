@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
         const body = await req.json();
-        const { code, name } = body;
+        const { code, name, divisions } = body;
 
         if (!code || !name) {
             return NextResponse.json({ error: "Please provide subject name and code" }, { status: 400 });
@@ -21,11 +21,33 @@ export async function POST(req: NextRequest) {
         }
 
         // نحفظ المادة (بنخلي رمز المادة هو الـ ID عشان نضمن إنه ما يتكرر)
+        // إذا كان فيها أقسام divisions ننشئها معها
+        const createDivisions = Array.isArray(divisions) 
+            ? divisions.map((d: any) => ({ name: d.name, maxScore: d.maxScore || 100 }))
+            : [];
+
         const subject = await prisma.subject.upsert({
             where: { id: code },
             update: { name: name },
-            create: { id: code, name: name },
+            create: { 
+                id: code, 
+                name: name,
+                divisions: {
+                    create: createDivisions
+                }
+            },
         });
+
+        // إذا كانت المادة موجودة سابقاً ونريد إضافة أقسام لها
+        if (subject && createDivisions.length > 0) {
+            for (const div of createDivisions) {
+                await prisma.subjectDivision.upsert({
+                    where: { subjectId_name: { subjectId: subject.id, name: div.name } },
+                    update: { maxScore: div.maxScore },
+                    create: { subjectId: subject.id, name: div.name, maxScore: div.maxScore }
+                });
+            }
+        }
 
         return NextResponse.json({ message: "Subject added successfully!", subject }, { status: 200 });
     } catch (error) {
@@ -42,6 +64,7 @@ export async function GET() {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
         const subjects = await prisma.subject.findMany({
+            include: { divisions: true },
             orderBy: { createdAt: 'desc' }
         });
         return NextResponse.json(subjects, { status: 200 });

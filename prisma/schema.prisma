@@ -20,17 +20,32 @@ model Student {
 
 // 2. جدول المواد
 model Subject {
+  id        String            @id @default(cuid())
+  name      String            @unique // اسم المادة
+  divisions SubjectDivision[] // أقسام المادة
+  grades    Grade[]           // علاقة: المادة لها عدة درجات للطلاب
+  createdAt DateTime          @default(now())
+}
+
+// 2.5 أقسام المادة (مثلاً ميدتيرم، فاينل، نشاط)
+model SubjectDivision {
   id        String   @id @default(cuid())
-  name      String   // اسم المادة
-  grades    Grade[]  // علاقة: المادة لها عدة درجات للطلاب
+  name      String   // اسم القسم
+  maxScore  Float?   // الدرجة القصوى (اختياري)
+  
+  subjectId String
+  subject   Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  
+  grades    Grade[]
+
+  @@unique([subjectId, name]) // لا يتكرر نفس القسم لنفس المادة
   createdAt DateTime @default(now())
 }
 
 // 3. جدول الدرجات
 model Grade {
   id        String   @id @default(cuid())
-  score     String   // الدرجة
-  examName  String   @default("General") // نوع الامتحان (مثلاً Midterm 1)
+  score     Float    // الدرجة (رقمية لتسهيل الحسابات)
   
   studentId String
   student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
@@ -38,9 +53,11 @@ model Grade {
   subjectId String
   subject   Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
 
-  // تحديث: الطالب ما تتكرر درجته في نفس المادة لنفس الامتحان
-  @@unique([studentId, subjectId, examName], name: "studentId_subjectId_examName")
+  divisionId String
+  division   SubjectDivision @relation(fields: [divisionId], references: [id], onDelete: Cascade)
+
+  // تحديث: الطالب ما تتكرر درجته في نفس القسم لنفس المادة
+  @@unique([studentId, divisionId], name: "studentId_divisionId")
   
   createdAt DateTime @default(now())
 }
-

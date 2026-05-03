@@ -20,7 +20,12 @@ export async function GET() {
             include: {
                 grades: {
                     include: {
-                        subject: true,
+                        subject: {
+                            include: {
+                                divisions: true,
+                            }
+                        },
+                        division: true,
                     },
                     orderBy: {
                         createdAt: 'desc',
@@ -38,16 +43,19 @@ export async function GET() {
 
         for (const grade of student.grades) {
             if (!subjectsMap.has(grade.subjectId)) {
+                const subjectMaxScore = grade.subject.divisions?.reduce((sum: number, div: any) => sum + (div.maxScore || 0), 0) || 100;
                 subjectsMap.set(grade.subjectId, {
                     subjectId: grade.subject.id,
                     subjectName: grade.subject.name,
+                    maxScore: subjectMaxScore,
                     grades: []
                 });
             }
             
             subjectsMap.get(grade.subjectId).grades.push({
                 id: grade.id,
-                examName: grade.examName,
+                examName: grade.division?.name || "Unknown",
+                maxScore: grade.division?.maxScore || 100,
                 score: grade.score,
                 date: grade.createdAt,
             });
