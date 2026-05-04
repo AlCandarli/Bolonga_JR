@@ -8,7 +8,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 
 
 // Types
-type Grade = { id: string; examName: string; score: string; maxScore: number; date: string; };
+type Grade = { id: string; examName: string; score: number; maxScore: number; date: string; };
 type SubjectData = { subjectId: string; subjectName: string; maxScore: number; grades: Grade[]; };
 type DashboardData = { studentName: string; studentCode: string; subjects: SubjectData[]; };
 
@@ -70,7 +70,7 @@ function DashboardContent() {
 
             // Sum ALL grade entries for this subject (not just the latest one)
             const totalSubjectScore = sub.grades.reduce((sum, g) => {
-                const val = parseFloat(g.score);
+                const val = Number(g.score);
                 return sum + (isNaN(val) ? 0 : val);
             }, 0);
             const scoreNum = sub.grades.length > 0 ? totalSubjectScore : NaN;
