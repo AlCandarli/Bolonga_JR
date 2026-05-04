@@ -67,7 +67,13 @@ function DashboardContent() {
 
         const enhancedSubjects = data.subjects.map((sub) => {
             const latestGrade = sub.grades.length > 0 ? sub.grades[0] : null;
-            const scoreNum = latestGrade ? parseFloat(latestGrade.score) : NaN;
+
+            // Sum ALL grade entries for this subject (not just the latest one)
+            const totalSubjectScore = sub.grades.reduce((sum, g) => {
+                const val = parseFloat(g.score);
+                return sum + (isNaN(val) ? 0 : val);
+            }, 0);
+            const scoreNum = sub.grades.length > 0 ? totalSubjectScore : NaN;
 
             if (!isNaN(scoreNum)) {
                 totalScore += scoreNum;
@@ -233,8 +239,8 @@ function DashboardContent() {
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6">
                         {processedStats.filteredSubjects.map((sub, idx) => {
-                            const isPassing = !isNaN(sub.scoreNum) && sub.scoreNum >= 50;
-                            const isFailing = !isNaN(sub.scoreNum) && sub.scoreNum < 50;
+                            const isPassing = !isNaN(sub.scoreNum) && sub.scoreNum >= (sub.maxScore / 2);
+                            const isFailing = !isNaN(sub.scoreNum) && sub.scoreNum < (sub.maxScore / 2);
                             const isNoGrade = isNaN(sub.scoreNum);
 
                             const progressWidth = isNoGrade ? "0%" : `${Math.min(100, Math.max(0, sub.scoreNum))}%`;
